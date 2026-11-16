@@ -1,106 +1,121 @@
-# 100x-Team (formerly 10x-Team)
+# 100x-Team (sebelumnya 10x-Team)
 
-A Claude Code plugin that gives you an entire engineering team as AI skills. 13 specialized roles — CTO, Architect, SRE, Security Engineer, Frontend UI/UX Engineer, and more — that share context, track decisions, and hand off work to each other.
+100x-Team adalah framework peningkatan kemampuan chatbot melalui *dynamic role switching*: satu chatbot yang sama dapat mengambil perspektif profesional yang berbeda sesuai pekerjaan. Ia menyediakan 13 role spesialis, domain knowledge, proses kerja per role, router untuk memilih role, dan konteks proyek yang berkesinambungan.
 
-One developer. A full team's coverage.
+Satu percakapan dapat dimulai dari perspektif CTO, dilanjutkan ke Principal Architect, SDE, DBA, Security Engineer, lalu QA Engineer. Itu **satu chatbot yang berganti role**, bukan enam agent berbeda — 100x-Team bukan framework multi-agent.
 
-## Install
+Satu developer. Cakupan sebuah tim penuh.
 
-From within Claude Code:
+> Berbasis [10x-Team](https://github.com/Jaan-Mustafa/10x-Team) karya Jaan-Mustafa (MIT). Lihat [Kredit & Lisensi](#kredit--lisensi).
+
+## Instalasi
+
+Kompatibilitas dan cara instalasi **bergantung pada platform chatbot** yang Anda pakai. Jalur yang saat ini didokumentasikan adalah integrasi skill native di Claude Code (di bawah). Chatbot lain (misalnya Grok, ChatGPT, atau Gemini) hanya dapat memakai 100x-Team jika platformnya mendukung mekanisme skill atau plugin yang kompatibel; jangan mengasumsikan semua chatbot memuat skill, menyimpan konteks, atau melakukan routing dengan cara yang sama. Aktivasi manual untuk chatbot tanpa dukungan skill adalah rencana masa depan dan belum tersedia.
+
+Integrasi skill native di Claude Code, dari dalam Claude Code:
 
 ```
-/plugin marketplace add Jaan-Mustafa/10x-Team
-/plugin install 10x-Team@10x-Team-dev
+/plugin marketplace add Gilangbahrula/100x-vault
+/plugin install 100x-Team@100x-vault-dev
 /reload-plugins
 ```
 
-## Available Skills
+## Skill yang Tersedia
 
-### Full Team
+### Tim Penuh
 
 | Skill | Use When |
 |-------|----------|
 | `/10x-team` | **Building projects end-to-end** — brainstorms first, then moves through strategy, design, planning, implementation, testing, and deployment with hard gates at every phase |
+| `/router` | **Not sure who should handle it?** — classifies the intent (domain keywords, artifact wanted, project phase, active role) and recommends the best-fitting role at the start and again whenever the work shifts mid-conversation, or `/10x-team` for cross-role work |
 
-### Individual Roles
+### Role Individual
 
 | Skill | Role | Use When |
 |-------|------|----------|
 | `/cto` | Chief Technology Officer | Build vs buy, business case, technical strategy |
 | `/product-manager` | Product Manager | Feature prioritization, user stories, roadmap |
-| `/principal-architect` | Principal Architect | System design, architecture decisions |
+| `/frontend-uiux-engineer` | Frontend UI/UX Engineer | UX flows, design system, accessibility, UI code |
+| `/principal-architect` | Principal Architect | System design, data model, API contracts, ADRs |
 | `/staff-engineer` | Staff Engineer | Cross-team technical decisions, code quality |
+| `/engineering-manager` | Engineering Manager | Team processes, sprint planning, delivery |
 | `/senior-engineer` | Senior Engineer | Implementation guidance, code review |
 | `/sde` | Software Development Engineer | Hands-on coding, debugging |
+| `/dba` | Database Administrator | Schema design, query optimization |
+| `/security-engineer` | Security Engineer | Security review, threat modeling |
+| `/qa-engineer` | QA Engineer | Testing strategy, test plans |
 | `/devops-engineer` | DevOps Engineer | CI/CD, infrastructure, deployment |
 | `/sre` | Site Reliability Engineer | Reliability, monitoring, incident response |
-| `/security-engineer` | Security Engineer | Security review, threat modeling |
-| `/dba` | Database Administrator | Schema design, query optimization |
-| `/qa-engineer` | QA Engineer | Testing strategy, test plans |
-| `/engineering-manager` | Engineering Manager | Team processes, sprint planning, delivery |
-| `/frontend-uiux-engineer` | Frontend UI/UX Engineer | UX psychology, design system, accessible UI code |
 
-## How Roles Communicate
+## Kesinambungan Konteks Antar-Role
 
-Skills share context across conversations through file-based project state in `.10x/`.
+Karena satu chatbot berganti role, kesinambungan dijaga lewat state proyek berbasis file di `.10x/` — bukan lewat komunikasi antar-agent. Setiap respons yang memakai 100x-Team diawali identitas skill aktif, misalnya `Using skill: "principal-architect"`; baris itu menyebut skill (bukan model), berganti saat role berganti, dan hanya muncul jika skill benar-benar termuat.
 
-### Setup
+Pekerjaan juga memiliki **Depth L1–L5** yang menyesuaikan diri dengan kompleksitas dan risiko; di respons cukup tampil `Depth: L#`. Depth menggambarkan kedalaman pekerjaan, bukan peringkat kompetensi atau jaminan kualitas, dan tidak pernah menggantikan hard gate.
+
+### Persiapan
 
 ```
 /init-project
 ```
 
-### State Structure
+### Struktur State
 
-State lives **one folder per role** under `.10x/decisions/` — each role writes
-`<feature-slug>.md` files plus an `_index.md` of cross-cutting principles, and
-reads its upstream dependencies before acting. Run `/init-project` to scaffold.
+State disimpan **satu folder per role** di bawah `.10x/decisions/` — setiap role menulis
+file `<feature-slug>.md` beserta `_index.md` berisi prinsip lintas-fitur, dan
+membaca dependensi hulunya sebelum bertindak. Jalankan `/init-project` untuk menyiapkannya.
+Nama folder mengikuti "Role → State Folder Map" di `/10x-team` — misalnya `/principal-architect` menulis ke `architect/` dan `/security-engineer` ke `security/`. `/router` tidak punya folder state karena ia tidak membuat keputusan proyek.
 
-### How It Works
-
-```
-/cto decides "Use Razorpay"
-  → writes decision to .10x/decisions/cto.md
-  → writes handoff context for PM and Architect
-
-/principal-architect designs the payment service
-  → reads CTO decision from .10x/decisions/cto.md
-  → designs with full context
-  → writes architecture to .10x/decisions/architect.md
-
-/sde implements the payment webhook
-  → reads ALL decision files
-  → codes with full team context
-  → writes what was built to .10x/decisions/sde.md
-```
-
-Every role reads its dependencies before acting and writes its decisions after completing work. The orchestrator (`/10x-team`) enforces this with hard gates at every phase transition.
-
-## Usage Examples
+### Cara Kerja
 
 ```
-> /10x-team Build me a URL shortener with analytics
+/cto memutuskan "Pakai Razorpay"
+  → menulis keputusan ke .10x/decisions/cto/payments.md
+  → menulis konteks handoff untuk PM dan Architect
 
-> /cto Should we build our own payment system or use Razorpay?
+/principal-architect merancang layanan pembayaran
+  → membaca .10x/decisions/cto/payments.md dan product-manager/payments.md
+  → merancang dengan konteks penuh
+  → menulis arsitektur ke .10x/decisions/architect/payments.md, plus ADR di .10x/adrs/
 
-> /principal-architect Design a notification service that handles 10M events/day
-
-> /sre Our API latency spiked 3x after the last deploy — help me investigate
-
-> /security-engineer Review this auth flow for vulnerabilities
-
-> /dba We have a 50M row table and this query is slow — optimize it
+/sde mengimplementasikan webhook pembayaran
+  → membaca setiap folder hulu di bawah .10x/decisions/
+  → menulis kode dengan konteks tim penuh
+  → menulis apa yang dibangun ke .10x/decisions/sde/payments.md
 ```
 
-## Project Structure
+Setiap kali chatbot mengambil sebuah role, ia membaca keputusan hulu sebelum bertindak dan menulis keputusannya setelah pekerjaan selesai; "handoff" hanyalah catatan untuk perspektif berikutnya di percakapan yang sama, bukan pesan antar-agent. Berpindah role tidak menghapus konteks dan tidak mengulang proyek dari awal. Pengguna dapat meminta pindah role kapan saja, dan `/router` dapat merekomendasikan pindah ketika kebutuhan berubah di tengah pekerjaan — tidak setiap pergantian topik berarti pergantian role. Orchestrator (`/10x-team`) menegakkan alur ini dengan hard gate di setiap transisi fase.
+
+## Contoh Penggunaan
 
 ```
-10x-Team/
+> /10x-team Buatkan pemendek URL dengan analitik
+
+> /cto Sebaiknya kita bangun sistem pembayaran sendiri atau pakai Razorpay?
+
+> /principal-architect Rancang layanan notifikasi yang menangani 10 juta event per hari
+
+> /sre Latensi API kami melonjak 3x setelah deploy terakhir — bantu saya menyelidikinya
+
+> /security-engineer Tinjau alur autentikasi ini untuk mencari kerentanan
+
+> /dba Tabel kami 50 juta baris dan query ini lambat — optimalkan
+
+> /router Pelanggan mengeluh checkout lambat, saya tidak tahu harus mulai dari role mana
+
+> Pindah ke /dba — indeks apa yang tepat untuk query ini?
+```
+
+## Struktur Proyek
+
+```
+100x-vault/
 ├── .claude-plugin/
-│   ├── plugin.json              # Plugin manifest
-│   └── marketplace.json         # Marketplace registry
+│   ├── plugin.json              # Manifest plugin
+│   └── marketplace.json         # Registri marketplace (100x-vault-dev)
 ├── skills/
-│   ├── 10x-team/SKILL.md       # Orchestrator — all 13 roles
+│   ├── 10x-team/SKILL.md       # Orchestrator — seluruh 13 role
+│   ├── router/SKILL.md         # Dispatcher — mengarahkan permintaan ke satu role
 │   ├── cto/SKILL.md
 │   ├── product-manager/SKILL.md
 │   ├── principal-architect/SKILL.md
@@ -115,26 +130,26 @@ Every role reads its dependencies before acting and writes its decisions after c
 │   ├── engineering-manager/SKILL.md
 │   └── frontend-uiux-engineer/SKILL.md
 ├── commands/
-│   └── init-project.md          # Initialize .10x/ project state
+│   └── init-project.md          # Inisialisasi state proyek .10x/
 ├── tests/
-│   └── validate-skills.test.js  # Skill structure validation
+│   └── validate-skills.test.js  # Validasi struktur skill
 └── docs/
-    └── adr/                     # Architecture decision records
+    └── adr/                     # Catatan keputusan arsitektur
 ```
 
-## Contributing
+## Berkontribusi
 
-Contributions are welcome! Whether it's improving an existing skill, adding a new role, fixing bugs, or improving documentation.
+Kontribusi sangat diterima! Baik untuk memperbaiki skill yang ada, menambah role baru, memperbaiki bug, maupun memperbaiki dokumentasi.
 
-### Adding a New Skill
+### Menambah Skill Baru
 
-1. Create a folder under `skills/` with a `SKILL.md` file:
+1. Buat folder di bawah `skills/` berisi file `SKILL.md`:
 
 ```
 skills/my-role/SKILL.md
 ```
 
-2. Follow this structure:
+2. Ikuti struktur ini (isi `SKILL.md` ditulis dalam bahasa Inggris, karena itulah yang dibaca AI untuk routing dan perilaku skill):
 
 ```markdown
 ---
@@ -166,7 +181,7 @@ Detailed guidance for each phase.
 ### Before You Start (EVERY time)
 Read relevant .10x/decisions/ files.
 ### Before You Finish (EVERY time)
-Write your decisions to .10x/decisions/<role>.md.
+Check your Definition of Done, then write your decisions to .10x/decisions/<role-folder>/<feature-slug>.md and update its _index.md.
 
 ## Key Principles
 Core rules that guide the skill's behavior.
@@ -175,31 +190,33 @@ Core rules that guide the skill's behavior.
 Common mistakes to call out.
 
 ## Tone
-How the skill should communicate.
+How the skill should communicate. Start responses with `Using skill: "my-role"` (see Skill Identity in /10x-team).
 ```
 
-3. Run tests:
+3. Jalankan tes:
 
 ```bash
 node tests/validate-skills.test.js
 ```
 
-4. Reload plugins:
+4. Muat ulang plugin:
 
 ```
 /reload-plugins
 ```
 
-### Updating an Existing Skill
+### Memperbarui Skill yang Ada
 
-1. Edit the `SKILL.md` in `skills/<role>/`
-2. Keep the same structure — frontmatter, hard gate, checklist, process, state protocol, principles
-3. Run tests and reload
+1. Edit `SKILL.md` di `skills/<role>/`
+2. Pertahankan struktur yang sama — frontmatter, hard gate, checklist, process, state protocol, prinsip
+3. Jalankan tes lalu muat ulang plugin
 
-### Reporting Issues
+### Melaporkan Masalah
 
-Found a bug or have an idea? [Open an issue](https://github.com/Jaan-Mustafa/10x-Team/issues).
+Menemukan bug atau punya ide? [Buka issue](https://github.com/Gilangbahrula/100x-vault/issues).
 
-## License
+## Kredit & Lisensi
 
-MIT
+100x-Team berdasar pada **10x-Team** karya Jaan-Mustafa (Md Rizabul), yang dirilis di bawah Lisensi MIT, lalu dikembangkan ulang secara besar-besaran menjadi **100x-Team** oleh Gilangbahrula.
+
+Dirilis di bawah Lisensi MIT — lihat [LICENSE](LICENSE). Teks lisensi tidak diubah: notice hak cipta asli tetap dipertahankan, dan satu baris hak cipta ditambahkan setelahnya untuk modifikasi dan pengembangan lanjutan.
