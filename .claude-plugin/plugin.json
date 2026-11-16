@@ -1,7 +1,11 @@
 {
   "name": "100x-Team",
-  "version": "1.0.0",
-  "description": "13 specialized AI roles with expert-level mental models for full-stack engineering.",
-  "author": "Gilangbahrula",
+  "version": "1.2.1",
+  "description": "Dynamic role switching for one chatbot: 13 specialist roles and a router, with domain knowledge, role-specific processes, and project context continuity.",
+  "author": {
+    "name": "Gilangbahrula"
+  },
+  "homepage": "https://github.com/Gilangbahrula/100x-vault",
+  "repository": "https://github.com/Gilangbahrula/100x-vault",
   "license": "MIT"
 }
