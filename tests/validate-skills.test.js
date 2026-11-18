@@ -346,6 +346,75 @@ function runTests() {
     }
   });
 
+  // ========== 11. Dewa Frontend role contract ==========
+  console.log('\n--- Dewa Frontend Role Contract ---');
+
+  const DEWA = 'dewa-frontend';
+  const dewaContent = readSkill(DEWA);
+  const routerContent = readSkill('router');
+  const initProjectPath = path.join(__dirname, '..', 'commands', 'init-project.md');
+
+  test('dewa-frontend exists alongside frontend-uiux-engineer (no replacement)', () => {
+    assert(dewaContent, 'skills/dewa-frontend/SKILL.md should exist');
+    assert(readSkill('frontend-uiux-engineer'), 'skills/frontend-uiux-engineer/SKILL.md must still exist');
+  });
+
+  test('dewa-frontend forbids application code in its HARD-GATE', () => {
+    const gate = dewaContent.match(/<HARD-GATE>([\s\S]*?)<\/HARD-GATE>/)[1];
+    assert(/Do NOT write application code/.test(gate), 'HARD-GATE should forbid writing application code');
+  });
+
+  test('dewa-frontend hands off to /frontend-uiux-engineer', () => {
+    assert(dewaContent.includes('`/frontend-uiux-engineer`'), 'Should name /frontend-uiux-engineer as the handoff target');
+    assert(dewaContent.includes('Approved by Commander'),
+      'Handoff must keep the Commander approval owned by frontend-uiux-engineer');
+  });
+
+  test('dewa-frontend defines all six gap-management statuses', () => {
+    for (const status of ['Confirmed', 'Derived', 'Assumption', 'Recommendation', 'Open Question', 'Conflict']) {
+      assert(dewaContent.includes('`' + status + '`'), `Should define status \`${status}\``);
+    }
+  });
+
+  test('dewa-frontend supports Markdown, JSON, and Mermaid under .10x/frontend/', () => {
+    assert(dewaContent.includes('.10x/frontend/'), 'Should write to .10x/frontend/');
+    for (const fmt of ['Markdown', 'JSON', 'Mermaid']) {
+      assert(dewaContent.includes(fmt), `Should support ${fmt}`);
+    }
+  });
+
+  test('dewa-frontend opens with its own identity line', () => {
+    assert(dewaContent.includes('Using skill: "dewa-frontend"'), 'Should define the skill identity line');
+  });
+
+  test('orchestrator maps dewa-frontend to its own state folder', () => {
+    assert(orchestratorContent.includes('| Dewa Frontend | `/dewa-frontend` | `dewa-frontend/` |'),
+      'Role -> State Folder Map should contain the dewa-frontend row');
+  });
+
+  test('router routes frontend specification work to /dewa-frontend', () => {
+    assert(routerContent.includes('`/dewa-frontend`'), 'Router should route to /dewa-frontend');
+    assert(routerContent.includes('`/frontend-uiux-engineer`'), 'Router should still route to /frontend-uiux-engineer');
+  });
+
+  test('init-project creates the dewa-frontend state folder', () => {
+    const init = fs.readFileSync(initProjectPath, 'utf-8');
+    assert(init.includes('dewa-frontend'), 'init-project should create .10x/decisions/dewa-frontend/');
+  });
+
+  // ========== 12. Plugin identifier format ==========
+  console.log('\n--- Plugin Identifier Format ---');
+
+  test('plugin and marketplace names use only lowercase letters, numbers, and hyphens', () => {
+    const base = path.join(__dirname, '..', '.claude-plugin');
+    const plugin = JSON.parse(fs.readFileSync(path.join(base, 'plugin.json'), 'utf-8'));
+    const market = JSON.parse(fs.readFileSync(path.join(base, 'marketplace.json'), 'utf-8'));
+    const names = [plugin.name].concat((market.plugins || []).map(x => x.name));
+    for (const n of names) {
+      assert(/^[a-z0-9]+(-[a-z0-9]+)*$/.test(n), `Invalid plugin name "${n}" (Claude.ai upload rejects it)`);
+    }
+  });
+
   // ========== Summary ==========
   console.log(`\n=== Results: ${passed} passed, ${failed} failed ===`);
   if (failed > 0) process.exit(1);

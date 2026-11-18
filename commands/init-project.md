@@ -1,6 +1,6 @@
 # /init-project — Initialize Project State for 100x-Team
 
-Set up the shared project state files that enable communication between all 13 skills.
+Set up the shared project state files that enable communication between all 14 skills.
 
 ## Steps
 
@@ -9,14 +9,14 @@ Set up the shared project state files that enable communication between all 13 s
 2. **Create the folder structure** (bash). Folder names are fixed — they match the Role → State Folder Map in the `/10x-team` orchestrator (for example `architect`, not `principal-architect`):
 
 ```bash
-mkdir -p .10x/decisions/{cto,product-manager,architect,staff-engineer,engineering-manager,senior-engineer,sde,dba,security,qa,devops,sre,frontend-uiux-engineer}
+mkdir -p .10x/decisions/{cto,product-manager,architect,staff-engineer,engineering-manager,senior-engineer,sde,dba,security,qa,devops,sre,frontend-uiux-engineer,dewa-frontend}
 mkdir -p .10x/adrs .10x/specs .10x/reviews
 ```
 
 3. **Create an `_index.md` inside each decisions folder**, so every role has a home for cross-cutting principles from day one:
 
 ```bash
-for role in cto product-manager architect staff-engineer engineering-manager senior-engineer sde dba security qa devops sre frontend-uiux-engineer; do
+for role in cto product-manager architect staff-engineer engineering-manager senior-engineer sde dba security qa devops sre frontend-uiux-engineer dewa-frontend; do
   cat > ".10x/decisions/$role/_index.md" <<EOF
 # $role — Cross-Cutting Principles & Active Features
 
@@ -50,6 +50,7 @@ done
 ### Pending
 - [ ] Phase 1 — CTO: Strategic direction and tech decisions
 - [ ] Phase 1 — PM: Requirements and scope definition
+- [ ] Phase 2 — Dewa Frontend (if there is a UI and a project package to read): frontend specification package in `.10x/frontend/`
 - [ ] Phase 2 — Frontend UI/UX Engineer (if there is a UI): UX strategy, site map, design system (UI build follows in Phase 4)
 - [ ] Phase 2 — Architect: System design + ADR
 - [ ] Phase 2 — Staff Engineer: Coding standards and patterns

@@ -1,6 +1,6 @@
 # 100x-Team (sebelumnya 10x-Team)
 
-100x-Team adalah framework peningkatan kemampuan chatbot melalui *dynamic role switching*: satu chatbot yang sama dapat mengambil perspektif profesional yang berbeda sesuai pekerjaan. Ia menyediakan 13 role spesialis, domain knowledge, proses kerja per role, router untuk memilih role, dan konteks proyek yang berkesinambungan.
+100x-Team adalah framework peningkatan kemampuan chatbot melalui *dynamic role switching*: satu chatbot yang sama dapat mengambil perspektif profesional yang berbeda sesuai pekerjaan. Ia menyediakan 14 role spesialis, domain knowledge, proses kerja per role, router untuk memilih role, dan konteks proyek yang berkesinambungan.
 
 Satu percakapan dapat dimulai dari perspektif CTO, dilanjutkan ke Principal Architect, SDE, DBA, Security Engineer, lalu QA Engineer. Itu **satu chatbot yang berganti role**, bukan enam agent berbeda — 100x-Team bukan framework multi-agent.
 
@@ -16,7 +16,7 @@ Integrasi skill native di Claude Code, dari dalam Claude Code:
 
 ```
 /plugin marketplace add Gilangbahrula/100x-vault
-/plugin install 100x-Team@100x-vault-dev
+/plugin install 100x-team@100x-vault-dev
 /reload-plugins
 ```
 
@@ -35,6 +35,7 @@ Integrasi skill native di Claude Code, dari dalam Claude Code:
 |-------|------|----------|
 | `/cto` | Chief Technology Officer | Build vs buy, business case, technical strategy |
 | `/product-manager` | Product Manager | Feature prioritization, user stories, roadmap |
+| `/dewa-frontend` | Dewa Frontend | Frontend design and specification from a project package — screen discovery, backend-to-UX traceability, design system spec, audit; documents only, no code |
 | `/frontend-uiux-engineer` | Frontend UI/UX Engineer | UX flows, design system, accessibility, UI code |
 | `/principal-architect` | Principal Architect | System design, data model, API contracts, ADRs |
 | `/staff-engineer` | Staff Engineer | Cross-team technical decisions, code quality |
@@ -101,6 +102,8 @@ Setiap kali chatbot mengambil sebuah role, ia membaca keputusan hulu sebelum ber
 
 > /dba Tabel kami 50 juta baris dan query ini lambat — optimalkan
 
+> /dewa-frontend Rancang spesifikasi frontend lengkap dari paket proyek ini (backend, PRD, registry komponen)
+
 > /router Pelanggan mengeluh checkout lambat, saya tidak tahu harus mulai dari role mana
 
 > Pindah ke /dba — indeks apa yang tepat untuk query ini?
@@ -114,7 +117,7 @@ Setiap kali chatbot mengambil sebuah role, ia membaca keputusan hulu sebelum ber
 │   ├── plugin.json              # Manifest plugin
 │   └── marketplace.json         # Registri marketplace (100x-vault-dev)
 ├── skills/
-│   ├── 10x-team/SKILL.md       # Orchestrator — seluruh 13 role
+│   ├── 10x-team/SKILL.md       # Orchestrator — seluruh 14 role
 │   ├── router/SKILL.md         # Dispatcher — mengarahkan permintaan ke satu role
 │   ├── cto/SKILL.md
 │   ├── product-manager/SKILL.md
@@ -128,6 +131,7 @@ Setiap kali chatbot mengambil sebuah role, ia membaca keputusan hulu sebelum ber
 │   ├── dba/SKILL.md
 │   ├── qa-engineer/SKILL.md
 │   ├── engineering-manager/SKILL.md
+│   ├── dewa-frontend/SKILL.md
 │   └── frontend-uiux-engineer/SKILL.md
 ├── commands/
 │   └── init-project.md          # Inisialisasi state proyek .10x/

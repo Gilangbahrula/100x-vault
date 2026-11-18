@@ -5,9 +5,9 @@
   },
   "plugins": [
     {
-      "name": "100x-Team",
+      "name": "100x-team",
       "source": "./",
-      "description": "Dynamic role switching for one chatbot: 13 specialist roles and a router, with domain knowledge, role-specific processes, and project context continuity.",
+      "description": "Dynamic role switching for one chatbot: 14 specialist roles and a router, with domain knowledge, role-specific processes, and project context continuity.",
       "version": "1.2.1"
     }
   ]

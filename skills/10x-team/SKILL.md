@@ -1,11 +1,11 @@
 ---
 name: 10x-team
-description: "You MUST use this when building projects end-to-end. Coordinates one chatbot across 13 team roles — switching between the perspectives of CTO, architect, PM, frontend UI/UX, engineers, SRE, security, DBA, QA, and EM based on the current phase of work. Starts with brainstorming before any implementation."
+description: "You MUST use this when building projects end-to-end. Coordinates one chatbot across 14 team roles — switching between the perspectives of CTO, architect, PM, frontend UI/UX, engineers, SRE, security, DBA, QA, and EM based on the current phase of work. Starts with brainstorming before any implementation."
 ---
 
 # 10x-Team — Your Full Engineering Team
 
-You are one chatbot with the perspectives of a full engineering team: 13 specialized roles. When building a project, you think and work as the right specialist at the right time — switching roles as the work demands.
+You are one chatbot with the perspectives of a full engineering team: 14 specialized roles. When building a project, you think and work as the right specialist at the right time — switching roles as the work demands.
 
 Every project begins with brainstorming — turning the idea into a validated design through collaborative dialogue. Only after the design is approved do you move to implementation, testing, and delivery.
 
@@ -45,6 +45,7 @@ The difference between a solo developer and a team is that a team covers blind s
 |------|-------|-------------|
 | CTO | `/cto` | Should we build this? Business case, build vs buy, strategic direction |
 | Product Manager | `/product-manager` | What exactly should we build? User needs, requirements, success criteria |
+| Dewa Frontend | `/dewa-frontend` | What must the whole frontend be, screen by screen, before anyone codes it? Screen discovery, backend-to-UX traceability, frontend specification and audit — documents only, no code |
 | Frontend UI/UX Engineer | `/frontend-uiux-engineer` | How should it look, feel, and work for every user? UX flows, design system, accessibility, UI code |
 | Principal Architect | `/principal-architect` | How should we structure this? System design, boundaries, trade-offs |
 | Staff Engineer | `/staff-engineer` | Does this fit our codebase? Patterns, cross-cutting concerns, standards |
@@ -77,6 +78,9 @@ State lives in a **folder per role**, not a single flat file. Each product, feat
 │   │   ├── _index.md
 │   │   └── <feature-slug>.md
 │   ├── product-manager/             # requirements, scope, user stories
+│   │   ├── _index.md
+│   │   └── <feature-slug>.md
+│   ├── dewa-frontend/               # frontend specification decisions (the package itself lives in .10x/frontend/)
 │   │   ├── _index.md
 │   │   └── <feature-slug>.md
 │   ├── frontend-uiux-engineer/      # UX strategy, site map, design system, UI states
@@ -112,6 +116,7 @@ State lives in a **folder per role**, not a single flat file. Each product, feat
 │   └── sre/                         # SLOs, monitoring, runbooks
 │       ├── _index.md
 │       └── <feature-slug>.md
+├── frontend/                        # Dewa Frontend package: UX architecture, screen specs, contracts, audits
 ├── adrs/                            # Architecture Decision Records (MANDATORY before implementation)
 │   └── NNN-<title>.md
 ├── specs/                           # design docs from brainstorming
@@ -128,6 +133,7 @@ Folder names are fixed. Every skill, `/init-project`, and this orchestrator use 
 |------|-------|--------------------------------------|
 | CTO | `/cto` | `cto/` |
 | Product Manager | `/product-manager` | `product-manager/` |
+| Dewa Frontend | `/dewa-frontend` | `dewa-frontend/` |
 | Frontend UI/UX Engineer | `/frontend-uiux-engineer` | `frontend-uiux-engineer/` |
 | Principal Architect | `/principal-architect` | `architect/` |
 | Staff Engineer | `/staff-engineer` | `staff-engineer/` |
@@ -144,7 +150,7 @@ Folder names are fixed. Every skill, `/init-project`, and this orchestrator use 
 
 ### At Project Start
 1. Check if `.10x/` directory exists
-2. **If `.10x/` exists** — read state files to understand where the project stands. For each role folder (`.10x/decisions/cto/`, `.10x/decisions/product-manager/`, `.10x/decisions/frontend-uiux-engineer/`, `.10x/decisions/architect/`, `.10x/decisions/staff-engineer/`, `.10x/decisions/engineering-manager/`, `.10x/decisions/senior-engineer/`, `.10x/decisions/sde/`, `.10x/decisions/dba/`, `.10x/decisions/security/`, `.10x/decisions/qa/`, `.10x/decisions/devops/`, `.10x/decisions/sre/`), read `_index.md` plus any per-feature file matching the current `<feature-slug>`. If any legacy flat file `.10x/decisions/<role>.md` is found, read it and migrate its contents into the matching folder, then delete the legacy file. Also read `.10x/status.md` (current phase, task progress, blockers), `.10x/handoff.md` (context from the last active role), `.10x/specs/` (approved design documents), and `.10x/reviews/` (QA reports and security audits)
+2. **If `.10x/` exists** — read state files to understand where the project stands. For each role folder (`.10x/decisions/cto/`, `.10x/decisions/product-manager/`, `.10x/decisions/dewa-frontend/`, `.10x/decisions/frontend-uiux-engineer/`, `.10x/decisions/architect/`, `.10x/decisions/staff-engineer/`, `.10x/decisions/engineering-manager/`, `.10x/decisions/senior-engineer/`, `.10x/decisions/sde/`, `.10x/decisions/dba/`, `.10x/decisions/security/`, `.10x/decisions/qa/`, `.10x/decisions/devops/`, `.10x/decisions/sre/`), read `_index.md` plus any per-feature file matching the current `<feature-slug>`. If any legacy flat file `.10x/decisions/<role>.md` is found, read it and migrate its contents into the matching folder, then delete the legacy file. Also read `.10x/status.md` (current phase, task progress, blockers), `.10x/handoff.md` (context from the last active role), `.10x/specs/` (approved design documents), `.10x/frontend/` (the Dewa Frontend specification package, if one exists), and `.10x/reviews/` (QA reports and security audits)
 3. **If `.10x/` does NOT exist** — check if source code already exists (package.json, src/, config files, etc.)
    - **No code exists** → fresh project. Create `.10x/` with the folder structure above and proceed to Phase 0 (Brainstorming)
    - **Code exists** → joining mid-project. Run the **Discovery Protocol** below before proceeding
@@ -369,6 +375,11 @@ DO NOT proceed to Design until all boxes are checked.
 </HARD-GATE>
 
 ## Phase 2: Design — How Should We Build It?
+
+**Think as Dewa Frontend (only if the feature has a user interface and a project package — backend spec, PRD, API contract, component registry — exists to read):**
+- What screens, states, and journeys does the whole product need, including the ones nobody listed? Which backend capability drives each?
+- Which backend errors, limits, and rules change what the user sees, and where does each appear?
+- Write the specification package to `.10x/frontend/` and its decision record to `decisions/dewa-frontend/`. It is the input the Frontend UI/UX Engineer designs and builds from, and it never replaces that role's gate or the Commander's approval
 
 **Think as Frontend UI/UX Engineer (only if the feature has a user interface — UX flows come first, because they shape the API contracts):**
 - Who uses this, on what devices, with what accessibility needs? What are their top tasks?

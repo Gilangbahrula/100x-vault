@@ -71,6 +71,7 @@ Emit the routing line ──> Definition of Done ──> hand off, and stop
 |----------------|-----------------|-------|
 | build or buy, strategy, vendor, budget, runway, technology direction | A decision with trade-offs and cost | `/cto` |
 | problem, users, requirements, priorities, scope, success metric, pricing | A problem statement, scope, acceptance criteria | `/product-manager` |
+| frontend specification, screen inventory, UX architecture from a backend spec or PRD, backend-to-UX mapping, audit of a frontend design, a project package or ZIP to design from | A frontend design and specification package (documents, no code) | `/dewa-frontend` |
 | screens, user flow, design system, color, typography, accessibility, components | A UX strategy, a design system, or UI code | `/frontend-uiux-engineer` |
 | architecture, service boundaries, consistency, API contract, scaling, ADR | A design with numbers and an ADR | `/principal-architect` |
 | coding standards, shared patterns, migration strategy, RFC, tech debt | A standard or migration plan that tooling enforces | `/staff-engineer` |
@@ -124,6 +125,7 @@ Example: inside `/principal-architect`, the question is which index to create fo
 | the logical model, boundaries, consistency | `/principal-architect` | `/dba` (physical schema, indexes, plans) |
 | writing or fixing code | `/sde` | `/senior-engineer` (approach and review) |
 | a standard or migration across teams | `/staff-engineer` | `/principal-architect` (one feature's design) |
+| a full frontend specification read from a project package, with screens discovered and backend traced | `/dewa-frontend` | `/frontend-uiux-engineer` (designs and builds the UI from an approved specification) |
 | deployment and pipelines | `/devops-engineer` | `/sre` (SLOs, alerts, incidents) |
 | what to build and why | `/product-manager` | `/cto` (technology direction and money) |
 | in what order and by when | `/engineering-manager` | `/product-manager` |
