@@ -415,6 +415,26 @@ function runTests() {
     }
   });
 
+// ========== 13. Version consistency ==========
+console.log('\n--- Version Consistency ---');
+
+test('plugin.json version matches marketplace.json plugin version', () => {
+  const base = path.join(__dirname, '..', '.claude-plugin');
+  const plugin = JSON.parse(fs.readFileSync(path.join(base, 'plugin.json'), 'utf-8'));
+  const market = JSON.parse(fs.readFileSync(path.join(base, 'marketplace.json'), 'utf-8'));
+  const entry = (market.plugins || []).find(p => p.name === plugin.name);
+  assert(entry, `marketplace.json must list a plugin entry named "${plugin.name}"`);
+  assert(entry.version === plugin.version,
+    `version mismatch: plugin.json "${plugin.version}" vs marketplace.json "${entry.version}"`);
+});
+
+test('plugin.json version follows semver (x.y.z)', () => {
+  const base = path.join(__dirname, '..', '.claude-plugin');
+  const plugin = JSON.parse(fs.readFileSync(path.join(base, 'plugin.json'), 'utf-8'));
+  assert(/^\d+\.\d+\.\d+$/.test(plugin.version),
+    `version "${plugin.version}" is not valid semver (expected x.y.z)`);
+});
+
   // ========== Summary ==========
   console.log(`\n=== Results: ${passed} passed, ${failed} failed ===`);
   if (failed > 0) process.exit(1);
